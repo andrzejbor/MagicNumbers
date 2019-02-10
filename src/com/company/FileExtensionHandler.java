@@ -12,11 +12,11 @@ import java.util.Map;
  */
 public class FileExtensionHandler {
 
-    String FilePath;
+    String filePath;
 
-    byte[] FileContent;
+    byte[] fileContent;
 
-    String SupposedFileExtension;
+    String supposedFileExtension;
 
     Map<String, ArrayList<ExtensionRulesContainer>> mapOfExtRules = new HashMap<>();
 
@@ -24,29 +24,30 @@ public class FileExtensionHandler {
 
     public FileExtensionHandler(String filePath) {
         correctExtension = "Invalid";
-        FilePath = filePath;
+        this.filePath = filePath;
         storeSupposedExt();
         try {
-            FileContent = getFileContent();
+            fileContent = getFileContent();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setExtensionRulesForGifJpg();
+        setExtensionRulesForGifJpgDoc();
+        setExtensionRulesForOtherFiles();
     }
 
 
     public String getSupposedFileExtension() {
-        return SupposedFileExtension;
+        return supposedFileExtension;
     }
 
     void storeSupposedExt() {
-        String[] parts = FilePath.split("\\.");
+        String[] parts = filePath.split("\\.");
         String fileExtension = parts[parts.length - 1];
-        SupposedFileExtension = fileExtension.toUpperCase();
+        supposedFileExtension = fileExtension.toUpperCase();
     }
 
     byte[] getFileContent() throws IOException {
-        File file = new File(FilePath);
+        File file = new File(filePath);
         byte[] FileContent = Files.readAllBytes(file.toPath());
         return FileContent;
     }
@@ -72,21 +73,28 @@ public class FileExtensionHandler {
         }
     }
 
-    void setExtensionRulesForGifJpg() {
+    void setExtensionRulesForGifJpgDoc() {
         addNewRule("GIF", new int[]{0, 1, 2, 3, 4, 5}, new int[]{0x47, 0x49, 0x46, 0x38, 0x39, 0x61});
         addNewRule("GIF", new int[]{0, 1, 2, 3, 4, 5}, new int[]{0x47, 0x49, 0x46, 0x38, 0x37, 0x61});
         addNewRule("JPG", new int[]{0, 1, -2, -1}, new int[]{0xFF, 0xD8, 0xFF, 0xD9});
         addNewRule("JPEG", new int[]{0, 1, -2, -1}, new int[]{0xFF, 0xD8, 0xFF, 0xD9});
+        addNewRule("DOC", new int[]{0, 1, 2, 3, 4, 5, 6, 7}, new int[]{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1});
+    }
+
+    void setExtensionRulesForOtherFiles() {
+        addNewRule("PDF", new int[]{0, 1, 2, 3}, new int[]{0x25, 0x50, 0x44, 0x46});
+        addNewRule("EXE", new int[]{0, 1}, new int[]{0x4D, 0x5A});
+        addNewRule("BIN", new int[]{0, 1, 2, 3}, new int[]{0x53, 0x50, 0x30, 0x31});
     }
 
 
     public void recognizeExtension() {
-        if (mapOfExtRules.containsKey(SupposedFileExtension) && isItSupposedExtension(SupposedFileExtension)) {
-            System.out.println("This is expected extension of file: " + SupposedFileExtension);
-        }else if (mapOfExtRules.containsKey(SupposedFileExtension) && !isItSupposedExtension(SupposedFileExtension)) {
+        if (mapOfExtRules.containsKey(supposedFileExtension) && isItSupposedExtension(supposedFileExtension)) {
+            System.out.println("This is expected extension of file: " + supposedFileExtension);
+        }else if (mapOfExtRules.containsKey(supposedFileExtension) && !isItSupposedExtension(supposedFileExtension)) {
             findCorrectExtension();
-            System.out.println("Extension is " + SupposedFileExtension + ", while actually it is a " + correctExtension);
-        }else if (!mapOfExtRules.containsKey(SupposedFileExtension)) {
+            System.out.println("Extension is " + supposedFileExtension + ", while actually it is a " + correctExtension);
+        }else if (!mapOfExtRules.containsKey(supposedFileExtension)) {
             System.out.println("This file extension is not supported in this application");
         }
     }
@@ -99,10 +107,10 @@ public class FileExtensionHandler {
             result = true;
 
             for (int byteIndex : rulesContainer.getRuleByteIndex()) {
-                if (byteIndex >= 0 && (byte)rulesContainer.getRuleByteValue()[index] != FileContent[byteIndex]) {
+                if (byteIndex >= 0 && (byte)rulesContainer.getRuleByteValue()[index] != fileContent[byteIndex]) {
                     result = false;
                     break;
-                } else if (byteIndex < 0 && (byte)rulesContainer.getRuleByteValue()[index] != FileContent[FileContent.length + byteIndex]) {
+                } else if (byteIndex < 0 && (byte)rulesContainer.getRuleByteValue()[index] != fileContent[fileContent.length + byteIndex]) {
                     result = false;
                     break;
                 }
@@ -119,7 +127,7 @@ public class FileExtensionHandler {
     }
     void findCorrectExtension() {
         for (Map.Entry<String, ArrayList<ExtensionRulesContainer>> entry: mapOfExtRules.entrySet()) {
-            if (entry.getKey() == SupposedFileExtension){
+            if (entry.getKey() == supposedFileExtension){
                 continue;
             }
             String extension = entry.getKey();

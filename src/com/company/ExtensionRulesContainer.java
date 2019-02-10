@@ -6,9 +6,9 @@ package com.company;
 public class ExtensionRulesContainer {
 
     int ruleByteIndex[];
-    byte ruleByteValue[];
+    int ruleByteValue[];
 
-    public ExtensionRulesContainer(int numOfBytesWithRules, int[] ruleByteIndex, byte[] ruleByteValue) throws Exception {
+    public ExtensionRulesContainer(int[] ruleByteIndex, int[] ruleByteValue) throws Exception {
         this.ruleByteIndex = ruleByteIndex;
         this.ruleByteValue = ruleByteValue;
         if (ruleByteIndex.length != ruleByteValue.length){
@@ -20,7 +20,7 @@ public class ExtensionRulesContainer {
         return ruleByteIndex;
     }
 
-    public byte[] getRuleByteValue() {
+    public int[] getRuleByteValue() {
         return ruleByteValue;
     }
 }

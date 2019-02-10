@@ -7,7 +7,7 @@ public class Main {
         String path = "C:\\Users\\Andrzej\\Desktop\\aaa\\jotpeg.jpg";
 
         FileExtensionHandler FEH = new FileExtensionHandler(path);
-        
+
         System.out.println(FEH.getSupposedFileExtension());
     }
 }

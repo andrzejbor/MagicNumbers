@@ -8,6 +8,8 @@ public class ExtensionRulesContainer {
     int ruleByteIndex[];
     int ruleByteValue[];
 
+    public ExtensionRulesContainer(){}
+
     public ExtensionRulesContainer(int[] ruleByteIndex, int[] ruleByteValue) throws Exception {
         this.ruleByteIndex = ruleByteIndex;
         this.ruleByteValue = ruleByteValue;
